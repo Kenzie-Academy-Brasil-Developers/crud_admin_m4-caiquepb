@@ -21,7 +21,6 @@ const createUsersServices = async (userData: TUserRequest): Promise<TUserRespons
     );
     const queryResult: QueryResult<TUserResponse> = await client.query(queryString);
     const newUser: TUserResponse = responseUserSchema.parse(queryResult.rows[0]);
-    console.log(newUser)
     return newUser;
 };
 

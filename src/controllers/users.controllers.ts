@@ -20,6 +20,7 @@ const listUsersController = async (request: Request, response: Response): Promis
 const listUsersLoggedController = async (request: Request, response: Response): Promise<Response> => {
     const userData = response.locals.user
     const users = await listLoggedUsersService(userData);
+    console.log(users)
     return response.json(users);
 };
 
