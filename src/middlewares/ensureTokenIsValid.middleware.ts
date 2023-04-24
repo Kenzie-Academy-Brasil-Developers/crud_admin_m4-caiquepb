@@ -12,13 +12,11 @@ const ensureTokenIsValidMiddleware = async (request: Request, response: Response
         if (err) {
             throw new AppError(err.message, 401);
         }
-        console.log(decoded)
         response.locals.user = {
             id: decoded.id,
             admin: decoded.admin,
         };
     });
-
     return next();
 };
 

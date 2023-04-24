@@ -7,11 +7,9 @@ type TUserRequest = Omit<TUser, "id">;
 
 type TUserResponse = Omit<TUser, "password">;
 
-type TUserResponseData = {
+type TUserUpdate = {
     name: string;
     email: string;
-    admin: boolean;
-    active: boolean
 };
 
-export { TUser, TUserRequest, TUserResponse, TUserResponseData };
+export { TUser, TUserRequest, TUserResponse, TUserUpdate };

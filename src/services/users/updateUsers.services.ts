@@ -1,10 +1,12 @@
 import format from "pg-format";
-import { TUser, TUserRequest, TUserResponse } from "../../interfaces/users.interfaces";
+import { TUserRequest, TUserResponse } from "../../interfaces/users.interfaces";
 import { QueryConfig, QueryResult } from "pg";
 import { client } from "../../database";
 import { responseUserSchema } from "../../schemas/users.schemas";
+import { AppError } from "../../error";
 
-const updateUsersService = async (userId: number, userData: Partial<TUserRequest>): Promise<TUserResponse> => {
+const updateUsersService = async (userId: number, userData: Partial<TUserRequest>, admin: boolean): Promise<TUserResponse> => {
+    const isAdmin = admin;
     const queryString: string = format(
         `
         UPDATE users
@@ -21,8 +23,11 @@ const updateUsersService = async (userId: number, userData: Partial<TUserRequest
         text: queryString,
         values: [userId],
     };
-    const queryResult: QueryResult<TUser> = await client.query(queryConfig);
+    const queryResult: QueryResult = await client.query(queryConfig);
     const user: TUserResponse = responseUserSchema.parse(queryResult.rows[0]);
+    if (user.admin && !isAdmin) {
+        throw new AppError("Insufficient Permission", 403);
+    }
     return user;
 };
 

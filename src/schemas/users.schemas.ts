@@ -13,7 +13,11 @@ const requestUserSchema = userSchema.omit({ id: true });
 
 const responseUserSchema = userSchema.omit({ password: true });
 
-const updateUserSchema = userSchema.omit({ id: true, password: true });
+const updateUserSchema = z.object({
+    name: z.string().max(20),
+    email: z.string().email().max(100).optional(),
+    password: z.string().max(120).optional(),
+});
 
 const responseUserListSchema = z.array(responseUserSchema);
 

@@ -5,9 +5,8 @@ import "dotenv/config";
 import { responseUserListSchema } from "../../schemas/users.schemas";
 import { AppError } from "../../error";
 
-const listUsersService = async (userData: any): Promise<Array<TUserResponse>> => {
+const listUsersService = async (userData: TUser): Promise<Array<TUserResponse>> => {
     const admin = userData.admin;
-    console.log(admin)
     if (!admin) {
         throw new AppError("Insufficient Permission", 403);
     }
