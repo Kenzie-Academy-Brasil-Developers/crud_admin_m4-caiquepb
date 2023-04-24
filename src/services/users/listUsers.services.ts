@@ -1,24 +1,24 @@
 import { QueryResult } from "pg";
-import { TUserResponse } from "../../interfaces/users.interfaces";
+import { TUser, TUserResponse } from "../../interfaces/users.interfaces";
 import { client } from "../../database";
+import "dotenv/config";
+import { responseUserListSchema } from "../../schemas/users.schemas";
 import { AppError } from "../../error";
 
-const listUsersService = async (token: string): Promise<Array<TUserResponse>> => {
-    if(!token){
-        throw new AppError("Token is missing!", 409)
+const listUsersService = async (userData: any): Promise<Array<TUserResponse>> => {
+    const admin = userData.admin;
+    if (!admin) {
+        throw new AppError("Insufficient Permission", 403);
     }
-    token = token.split(" ")[1];
-
     const queryString: string = `
         SELECT
-            "id",
-            "name",
-            "email"
+            *
         FROM
             users;
     `;
     const queryResult: QueryResult<TUserResponse> = await client.query(queryString);
-    return queryResult.rows;
+    const users: Array<TUserResponse> = responseUserListSchema.parse(queryResult.rows);
+    return users;
 };
 
 export default listUsersService;

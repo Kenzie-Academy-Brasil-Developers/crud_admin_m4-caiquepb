@@ -1,7 +1,8 @@
 import format from "pg-format";
-import { TUserRequest, TUserResponse } from "../../interfaces/users.interfaces";
+import { TUser, TUserRequest, TUserResponse } from "../../interfaces/users.interfaces";
 import { QueryConfig, QueryResult } from "pg";
 import { client } from "../../database";
+import { responseUserSchema } from "../../schemas/users.schemas";
 
 const updateUsersService = async (userId: number, userData: Partial<TUserRequest>): Promise<TUserResponse> => {
     const queryString: string = format(
@@ -11,7 +12,7 @@ const updateUsersService = async (userId: number, userData: Partial<TUserRequest
         WHERE
             id = $1
         RETURNING
-            "id", "name", "email";
+            *;
         `,
         Object.keys(userData),
         Object.values(userData)
@@ -20,8 +21,9 @@ const updateUsersService = async (userId: number, userData: Partial<TUserRequest
         text: queryString,
         values: [userId],
     };
-    const queryResult: QueryResult<TUserResponse> = await client.query(queryConfig);
-    return queryResult.rows[0];
+    const queryResult: QueryResult<TUser> = await client.query(queryConfig);
+    const user: TUserResponse = responseUserSchema.parse(queryResult.rows[0]);
+    return user;
 };
 
 export default updateUsersService;

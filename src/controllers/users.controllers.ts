@@ -3,6 +3,7 @@ import createUsersServices from "../services/users/createUsers.services";
 import { TUserRequest, TUserResponse } from "../interfaces/users.interfaces";
 import listUsersService from "../services/users/listUsers.services";
 import updateUsersService from "../services/users/updateUsers.services";
+import listLoggedUsersService from "../services/users/listUsersLogged.services";
 
 const createUsersController = async (request: Request, response: Response): Promise<Response> => {
     const userData: TUserRequest = request.body;
@@ -11,7 +12,14 @@ const createUsersController = async (request: Request, response: Response): Prom
 };
 
 const listUsersController = async (request: Request, response: Response): Promise<Response> => {
-    const users = await listUsersService();
+    const userData = response.locals.user
+    const users = await listUsersService(userData);
+    return response.json(users);
+};
+
+const listUsersLoggedController = async (request: Request, response: Response): Promise<Response> => {
+    const userData = response.locals.user
+    const users = await listLoggedUsersService(userData);
     return response.json(users);
 };
 
@@ -22,4 +30,8 @@ const updateUsersController = async (request: Request, response: Response): Prom
     return response.json(updatedUser);
 };
 
-export { createUsersController, listUsersController, updateUsersController };
+const deleteUsersController = async (request: Request, response: Response): Promise<Response | void> => {};
+
+const reactivateUsersController = async (request: Request, response: Response): Promise<Response | void> => {};
+
+export { createUsersController, listUsersController, listUsersLoggedController, updateUsersController, deleteUsersController, reactivateUsersController };

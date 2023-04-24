@@ -24,7 +24,6 @@ const ensureUserExists = async (request: Request, response: Response, next: Next
     const queryResult: QueryResult<TUserResponse> = await client.query(queryConfig);
     if (queryResult.rowCount === 0) {
         throw new AppError("User not found", 404);
-        console.log("Error")
     }
     return next();
 };

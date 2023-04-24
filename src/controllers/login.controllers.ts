@@ -8,4 +8,4 @@ const loginController = async (request: Request, response: Response): Promise<Re
     return response.status(201).json(token);
 };
 
-export default loginController
+export default loginController;

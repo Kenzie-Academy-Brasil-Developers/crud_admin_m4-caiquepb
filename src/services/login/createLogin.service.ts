@@ -6,8 +6,9 @@ import { client } from "../../database";
 import { AppError } from "../../error";
 import * as bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import "dotenv/config";
 
-const createLoginService = async (payload: TLoginRequest): Promise<TLoginResponse> => {
+const createLoginService = async (userData: TLoginRequest): Promise<TLoginResponse> => {
     const queryString: string = format(
         `
         SELECT 
@@ -17,24 +18,25 @@ const createLoginService = async (payload: TLoginRequest): Promise<TLoginRespons
         WHERE
             email = %L;
     `,
-        payload.email
+        userData.email
     );
     const queryResult: QueryResult<TUser> = await client.query(queryString);
-    const user = queryResult.rows[0];
+    const user: TUser = queryResult.rows[0];
     if (queryResult.rowCount === 0) {
-        throw new AppError("Wrong email or password");
+        throw new AppError("Wrong email or password", 401);
     }
-    const comparePassword = await bcrypt.compare(payload.password, queryResult.rows[0].password);
+    const comparePassword: boolean = await bcrypt.compare(userData.password, user.password);
     if (!comparePassword) {
-        throw new AppError("Wrong email or password");
+        throw new AppError("Wrong email or password", 401);
     }
     const token: string = jwt.sign(
         {
             name: user.name,
+            email: user.email,
         },
-        "chave secreta",
+        process.env.SECRET_KEY!,
         {
-            expiresIn: "1d",
+            expiresIn: process.env.EXPIRES_IN!,
             subject: user.id.toString(),
         }
     );

@@ -3,6 +3,7 @@ import { TUserRequest, TUserResponse } from "../../interfaces/users.interfaces";
 import { QueryResult } from "pg";
 import { client } from "../../database";
 import * as bcrypt from "bcryptjs";
+import { responseUserSchema } from "../../schemas/users.schemas";
 
 const createUsersServices = async (userData: TUserRequest): Promise<TUserResponse> => {
     userData.password = await bcrypt.hash(userData.password, 10);
@@ -13,13 +14,15 @@ const createUsersServices = async (userData: TUserRequest): Promise<TUserRespons
         VALUES
             (%L)
         RETURNING
-            "id", "name", "email";
+            *;
         `,
         Object.keys(userData),
         Object.values(userData)
     );
     const queryResult: QueryResult<TUserResponse> = await client.query(queryString);
-    return queryResult.rows[0];
+    const newUser: TUserResponse = responseUserSchema.parse(queryResult.rows[0]);
+    console.log(newUser)
+    return newUser;
 };
 
 export default createUsersServices;
