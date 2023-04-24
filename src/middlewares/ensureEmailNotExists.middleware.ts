@@ -1,0 +1,28 @@
+import { NextFunction, Request, Response } from "express";
+import { QueryConfig, QueryResult } from "pg";
+import { client } from "../database";
+import { AppError } from "../error";
+
+const ensureEmailNotExistsMiddleware = async (request: Request, response: Response, next: NextFunction): Promise<Response | void> => {
+    const email = request.body.email;
+    const queryString: string = `
+        SELECT
+            *
+        FROM
+            users
+        WHERE
+            email = $1;
+    `;
+    const queryConfig: QueryConfig = {
+        text: queryString,
+        values: [email],
+    };
+    const queryResult: QueryResult = await client.query(queryConfig);
+    if (queryResult.rowCount !== 0) {
+        throw new AppError("Email already exists", 409);
+        console.log("Error")
+    }
+    return next();
+};
+
+export default ensureEmailNotExistsMiddleware;
